@@ -13,6 +13,7 @@ import {
   Stethoscope,
   User,
   LogOut,
+  Radio,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -39,19 +40,9 @@ const menuItems = {
       href: "/dashboard/rep",
     },
     {
-      title: "Visits",
-      icon: Video,
-      href: "/dashboard/rep/visits",
-    },
-    {
       title: "Evaluations",
       icon: GraduationCap,
       href: "/dashboard/rep/evaluations",
-    },
-    {
-      title: "Chat",
-      icon: MessageSquare,
-      href: "/dashboard/rep/chat",
     },
   ],
   trainer: [
@@ -59,21 +50,6 @@ const menuItems = {
       title: "Dashboard",
       icon: Home,
       href: "/dashboard/trainer",
-    },
-    {
-      title: "Scenarios",
-      icon: FileText,
-      href: "/dashboard/trainer/scenarios",
-    },
-    {
-      title: "Doctors",
-      icon: Stethoscope,
-      href: "/dashboard/trainer/doctors",
-    },
-    {
-      title: "Visits",
-      icon: Video,
-      href: "/dashboard/trainer/visits",
     },
     {
       title: "Agents",
@@ -87,37 +63,12 @@ const menuItems = {
       icon: Home,
       href: "/dashboard/manager",
     },
-    {
-      title: "Analytics",
-      icon: BarChart3,
-      href: "/dashboard/manager/analytics",
-    },
-    {
-      title: "Team",
-      icon: Users,
-      href: "/dashboard/manager/team",
-    },
-    {
-      title: "Reports",
-      icon: FileText,
-      href: "/dashboard/manager/reports",
-    },
   ],
   admin: [
     {
       title: "Dashboard",
       icon: Home,
       href: "/dashboard/admin",
-    },
-    {
-      title: "Users",
-      icon: Users,
-      href: "/dashboard/admin/users",
-    },
-    {
-      title: "Settings",
-      icon: Settings,
-      href: "/dashboard/admin/settings",
     },
   ],
 };
@@ -173,7 +124,7 @@ export function AppSidebar() {
               asChild
               tooltip={user?.name || "Profile"}
             >
-              <Link href="/dashboard/profile">
+              <Link href="/dashboard">
                 <User className="h-4 w-4" />
                 <span>{user?.name || "Profile"}</span>
               </Link>

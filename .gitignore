@@ -32,6 +32,8 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+!.env.local.example
 
 # vercel
 .vercel
@@ -39,3 +41,58 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# documentation files (except main README.md)
+# All deployment and temporary .md files are ignored
+*.md
+!README.md
+
+# Explicitly ignore deployment and status .md files
+DEPLOY*.md
+*_DEPLOYMENT*.md
+*_STATUS*.md
+AGENT_*.md
+DASHBOARD_*.md
+FIND_*.md
+QUICK_*.md
+INTEGRATION_*.md
+README-AGENTS.md
+
+# Scripts - исключаем все скрипты из репозитория
+# В репозитории только рабочий код, скрипты локально
+/scripts/
+*.ps1
+*.sh
+*.bat
+**/install.bat
+**/install.sh
+**/*.ps1
+**/*.sh
+agents/install.bat
+agents/install.sh
+agents/start_agent.py
+agents/run_worker.py
+
+# Secrets and environment files - НИКОГДА не коммитить!
+secrets.txt
+*secrets*.txt
+*SECRET*.txt
+ENV_VARIABLES*.txt
+**/secrets.txt
+**/*secrets*.txt
+**/ENV_VARIABLES*.txt
+
+# Agent deployment files with secrets and IDs
+agents/.env*
+agents/secrets.txt
+agents/*secrets*.txt
+agents/ENV_VARIABLES*.txt
+agents/.livekit.yaml
+agents/livekit.toml
+agents/render.yaml
+agents/fly.toml
+
+# Temporary and deployment files
+*.zip
+*.tar.gz
+agent.zip
