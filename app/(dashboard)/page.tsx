@@ -32,7 +32,7 @@ export default function DashboardPage() {
   }, [user, router]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+    <div className="min-h-screen bg-linear-to-br from-black via-gray-900 to-black flex items-center justify-center">
       <div className="text-center">
         <Loader2 className="w-8 h-8 animate-spin text-blue-400 mx-auto mb-4" />
         <p className="text-slate-300">Redirecting to your dashboard...</p>

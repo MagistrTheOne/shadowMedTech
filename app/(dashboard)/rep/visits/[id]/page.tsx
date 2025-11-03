@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { VoiceChat } from '@/components/voice/voice-chat';
+import { UnifiedChat } from '@/components/chat/unified-chat';
 import { useAuth } from '@/contexts/auth-context';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -86,7 +86,7 @@ export default function VisitPage() {
 
   if (loading || isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-black via-gray-900 to-black">
         <Spinner size="lg" />
       </div>
     );
@@ -99,7 +99,7 @@ export default function VisitPage() {
 
   if (error) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-black via-gray-900 to-black">
         <Card className="glass-card max-w-md">
           <CardHeader>
             <CardTitle className="text-red-400">Ошибка</CardTitle>
@@ -118,7 +118,7 @@ export default function VisitPage() {
 
   if (!visit || !livekitToken) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-black via-gray-900 to-black">
         <Card className="glass-card max-w-md">
           <CardHeader>
             <CardTitle className="text-white">Загрузка визита...</CardTitle>
@@ -132,7 +132,7 @@ export default function VisitPage() {
   }
 
   return (
-    <VoiceChat
+    <UnifiedChat
       roomName={visit.livekitRoomName}
       livekitToken={livekitToken}
       doctorName={visit.doctor.name}

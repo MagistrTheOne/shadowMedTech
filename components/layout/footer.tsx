@@ -37,11 +37,11 @@ export function Footer() {
   const socialLinks = [
     { icon: Github, href: "https://github.com/MagistrTheOne", label: "GitHub" },
     { icon: Twitter, href: "https://twitter.com/MagistrTheOne", label: "Twitter" },
-    { icon: Mail, href: "mailto:contact@MagistrTheOne.com", label: "Email" }
+    { icon: Mail, href: "mailto:maxonyushko71@gmail.com", label: "Email" }
   ];
 
   return (
-    <footer className="bg-gradient-to-t from-black to-gray-900 border-t border-white/10">
+    <footer className="bg-linear-to-t from-black to-gray-900 border-t border-white/10">
       <div className="container mx-auto px-4 py-16">
         {/* Main Footer Content */}
         <div className="grid md:grid-cols-2 lg:grid-cols-6 gap-8 mb-12">
@@ -58,8 +58,8 @@ export function Footer() {
             {/* Contact Info */}
             <div className="space-y-3">
               <div className="flex items-center text-gray-400">
-                <Mail className="w-4 h-4 mr-3 text-blue-400" />
-                <span className="text-sm">contact@MagistrTheOne.com</span>
+                <Mail className="w-4 h-4 mr-3 text-white" />
+                <span className="text-sm">maxonyushko71@gmail.com</span>
               </div>
               <div className="flex items-center text-gray-400">
                 <MapPin className="w-4 h-4 mr-3 text-blue-400" />

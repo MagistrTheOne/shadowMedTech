@@ -82,8 +82,14 @@ export default function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Get token from request
-  const token = getTokenFromRequest(request);
+  // Get token from request (Authorization header or cookie)
+  let token = getTokenFromRequest(request);
+  
+  // If no token in header, check cookies
+  if (!token) {
+    const cookies = request.cookies.get('auth-token');
+    token = cookies?.value || null;
+  }
 
   if (!token) {
     // No token provided

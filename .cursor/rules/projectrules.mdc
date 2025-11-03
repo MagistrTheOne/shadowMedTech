@@ -1,0 +1,135 @@
+
+---
+
+### 🧠 Общие принципы проекта
+
+* **Stack:** Next 16 (App Router, server actions) + TypeScript + Drizzle ORM + PostgreSQL (Neon) + Tailwind 4 + shadcn/ui.
+* **Формат:** ESM, strict mode везде, zero any.
+* **Env:** все ключи в `.env` → валидируются через `zod` в `env.ts`.
+* **Server actions only:** минимум API routes, бизнес-логика → серверные action-функции.
+* **No client madness:** компонент помечай `'use client'` только если есть hookи или browser API.
+* **Async only DB:** любые запросы через repo-функции в `/lib/db/`.
+
+---
+
+### 🧩 Структура папок
+
+```
+src/
+  app/                # Next App Router
+    (routes)/         # layout groups
+    api/              # edge/server routes (если прям надо)
+    layout.tsx
+    page.tsx
+  components/         # ui + features
+    ui/               # shadcn components
+    shared/           # переиспользуемые виджеты
+  lib/
+    db/               # drizzle configs + schema + queries
+    utils/            # helpers, formatters, fetchers
+    env.ts            # zod schema + dotenv
+  styles/
+    globals.css
+  types/
+    index.d.ts
+```
+
+---
+
+### 💾 Drizzle + Neon
+
+```ts
+// lib/db/index.ts
+import { drizzle } from 'drizzle-orm/neon-http'
+import { neon } from '@neondatabase/serverless'
+import * as schema from './schema'
+
+const sql = neon(process.env.DATABASE_URL!)
+export const db = drizzle(sql, { schema })
+```
+
+**Schema example:**
+
+```ts
+// lib/db/schema/users.ts
+import { pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core'
+
+export const users = pgTable('users', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+  email: text('email').unique().notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+})
+```
+
+---
+
+### 💅 Tailwind 4
+
+* Используй **`@layer components`** для кастомных слоёв.
+* Все кастомные темы — через CSS variables в `:root`.
+* **No inline styles**, только utility классы или `.module.css`.
+
+**Пример:**
+
+```css
+/* styles/globals.css */
+@import "tailwindcss";
+
+@layer base {
+  html { @apply bg-background text-foreground; }
+}
+```
+
+---
+
+### ⚙️ Код-стиль и линт
+
+**ESLint + Prettier + Standard-like:**
+
+```json
+{
+  "extends": ["next/core-web-vitals", "eslint:recommended"],
+  "rules": {
+    "semi": ["error", "never"],
+    "quotes": ["error", "single"],
+    "no-unused-vars": ["error"],
+    "react-hooks/exhaustive-deps": "warn",
+    "@next/next/no-html-link-for-pages": "off"
+  }
+}
+```
+
+**TSConfig фишки:**
+
+```json
+{
+  "compilerOptions": {
+    "baseUrl": "src",
+    "paths": { "@/*": ["*"] },
+    "strict": true,
+    "jsx": "preserve",
+    "moduleResolution": "bundler"
+  }
+}
+```
+
+---
+
+### 🧰 Git & CI
+
+* `pre-commit`: `lint-staged` → ESLint + TypeCheck.
+* `drizzle-kit` → миграции.
+* `vercel.json` → build → `next build`.
+* Автоматически деплоить на Vercel, база → Neon project branch.
+
+---
+
+### 🧪 Dev-flow
+
+1. `npm run dev` → локалка. только после апрува.
+2. `drizzle-kit generate:pg` → схема.
+3. `drizzle-kit push` → Neon sync.
+4. git push → Vercel preview.
+
+ 

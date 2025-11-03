@@ -281,7 +281,7 @@ export function VoiceChat({
   };
 
   return (
-    <div className="flex flex-col h-full max-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="flex flex-col h-full max-h-screen bg-linear-to-br from-black via-gray-900 to-black">
       {/* Header */}
       <div className="flex items-center justify-between p-6 glass-card m-4">
         <div className="flex items-center space-x-4">

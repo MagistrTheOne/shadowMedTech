@@ -1,0 +1,36 @@
+services:
+  - type: worker
+    name: doctor-agent
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python run_worker.py
+    envVars:
+      - key: LIVEKIT_URL
+        sync: false
+      - key: LIVEKIT_API_KEY
+        sync: false
+      - key: LIVEKIT_API_SECRET
+        sync: false
+      - key: GIGACHAT_CLIENT_ID
+        sync: false
+      - key: GIGACHAT_CLIENT_SECRET
+        sync: false
+      - key: GIGACHAT_AUTHORIZATION_KEY
+        sync: false
+      - key: GIGACHAT_API_URL
+        sync: false
+      - key: GIGACHAT_OAUTH_URL
+        sync: false
+      - key: GIGACHAT_SCOPE
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: NEXTJS_API_URL
+        sync: false
+      - key: AGENT_SERVICE_TOKEN
+        sync: false
+      - key: USE_SILERO_TTS
+        value: "true"
+      - key: USE_OPENAI_STT
+        value: "true"
+

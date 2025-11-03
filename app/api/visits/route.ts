@@ -158,6 +158,37 @@ export async function POST(request: NextRequest) {
       .where(eq(visits.id, newVisit.id))
       .limit(1);
 
+    // Dispatch AI doctor agent
+    // For LiveKit Cloud: agent is automatically dispatched when participant joins
+    // For self-hosted: start agent process explicitly
+    try {
+      const useLiveKitCloud = process.env.LIVEKIT_CLOUD === 'true';
+      
+      if (useLiveKitCloud) {
+        // LiveKit Cloud: just ensure room exists, agent will auto-dispatch
+        await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/livekit/agents/dispatch`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            roomName,
+            visitId: newVisit.id,
+          }),
+        });
+        console.log(`Agent will be auto-dispatched for visit ${newVisit.id} in room ${roomName}`);
+      } else {
+        // Self-hosted: start agent process
+        await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/livekit/agents/start`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ visitId: newVisit.id }),
+        });
+        console.log(`AI Doctor started for visit ${newVisit.id}`);
+      }
+    } catch (agentError) {
+      console.error('Failed to dispatch/start AI doctor:', agentError);
+      // Don't fail the visit creation if agent fails to start
+    }
+
     return NextResponse.json({
       message: 'Visit created successfully',
       visit: visitWithData,

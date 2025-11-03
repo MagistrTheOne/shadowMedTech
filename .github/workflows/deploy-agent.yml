@@ -1,0 +1,91 @@
+name: Deploy LiveKit Agent
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'agents/**'
+      - '.github/workflows/deploy-agent.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy-livekit-cloud:
+    name: Deploy to LiveKit Cloud
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[deploy-agent]')
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          cd agents
+          pip install -r requirements.txt
+      
+      - name: Install LiveKit CLI
+        run: |
+          curl -sSL https://get.livekit.io | bash
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+      
+      - name: Authenticate LiveKit Cloud
+        run: |
+          echo "$LIVEKIT_API_KEY" | lk cloud auth --api-key
+        env:
+          LIVEKIT_API_KEY: ${{ secrets.LIVEKIT_API_KEY }}
+          LIVEKIT_API_SECRET: ${{ secrets.LIVEKIT_API_SECRET }}
+      
+      - name: Deploy Agent to LiveKit Cloud
+        run: |
+          cd agents
+          lk agent deploy
+        env:
+          LIVEKIT_URL: ${{ secrets.LIVEKIT_URL }}
+          LIVEKIT_API_KEY: ${{ secrets.LIVEKIT_API_KEY }}
+          LIVEKIT_API_SECRET: ${{ secrets.LIVEKIT_API_SECRET }}
+          GIGACHAT_AUTHORIZATION_KEY: ${{ secrets.GIGACHAT_AUTHORIZATION_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          NEXTJS_API_URL: ${{ secrets.NEXTJS_API_URL }}
+          AGENT_SERVICE_TOKEN: ${{ secrets.AGENT_SERVICE_TOKEN }}
+
+  deploy-flyio:
+    name: Deploy to Fly.io
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[deploy-flyio]')
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Fly CLI
+        uses: superfly/flyctl-actions/setup-flyctl@master
+      
+      - name: Deploy to Fly.io
+        working-directory: ./agents
+        run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+  deploy-render:
+    name: Deploy to Render
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[deploy-render]')
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Render CLI
+        run: |
+          curl -fsSL https://render.com/install.sh | bash
+          echo "$HOME/.render/bin" >> $GITHUB_PATH
+      
+      - name: Deploy to Render
+        working-directory: ./agents
+        run: |
+          render deploy
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+

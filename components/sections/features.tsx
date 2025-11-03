@@ -9,9 +9,6 @@ import {
   FileText,
   BarChart3,
   Shield,
-  Users,
-  Target,
-  Zap,
   CheckCircle
 } from "lucide-react";
 
@@ -62,7 +59,7 @@ export function Features() {
   ];
 
   return (
-    <section id="features" className="py-24 bg-gradient-to-b from-black to-gray-900">
+    <section id="features" className="py-24 bg-linear-to-b from-black to-gray-900">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -105,7 +102,7 @@ export function Features() {
                 <div className="space-y-2">
                   {feature.benefits.map((benefit, benefitIndex) => (
                     <div key={benefitIndex} className="flex items-center text-gray-400">
-                      <CheckCircle className="w-4 h-4 text-green-400 mr-2 flex-shrink-0" />
+                      <CheckCircle className="w-4 h-4 text-green-400 mr-2 shrink-0" />
                       <span className="text-sm">{benefit}</span>
                     </div>
                   ))}
@@ -115,32 +112,6 @@ export function Features() {
           ))}
         </div>
 
-        {/* Additional Stats Section */}
-        <div className="mt-20 grid md:grid-cols-4 gap-8 max-w-4xl mx-auto">
-          {[
-            { icon: <Users className="w-6 h-6" />, value: "500+", label: "Active Users" },
-            { icon: <Target className="w-6 h-6" />, value: "10K+", label: "Completed Visits" },
-            { icon: <Zap className="w-6 h-6" />, value: "99.5%", label: "Accuracy Rate" },
-            { icon: <Shield className="w-6 h-6" />, value: "100%", label: "Data Security" }
-          ].map((stat, index) => (
-            <Card
-              key={index}
-              className="backdrop-blur-md bg-white/5 border-white/10 text-center p-6"
-            >
-              <CardContent className="pt-6">
-                <div className="text-blue-400 mb-2 flex justify-center">
-                  {stat.icon}
-                </div>
-                <div className="text-2xl font-bold text-white mb-1">
-                  {stat.value}
-                </div>
-                <div className="text-gray-400 text-sm">
-                  {stat.label}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
       </div>
     </section>
   );

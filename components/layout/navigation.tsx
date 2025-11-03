@@ -1,43 +1,41 @@
-"use client";
+'use client'
 
-import { Button } from "@/components/ui/button";
+import Link from 'next/link'
+import { Menu } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import {
   NavigationMenu,
-  NavigationMenuContent,
   NavigationMenuItem,
   NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu } from "lucide-react";
-import Link from "next/link";
+} from '@/components/ui/navigation-menu'
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 
 export function Navigation() {
   const navItems = [
-    { href: "#features", label: "Features" },
-    { href: "#pricing", label: "Pricing" },
-  ];
+    { href: '#features', label: 'Features' },
+    { href: '#pricing', label: 'Pricing' },
+  ]
 
   return (
-    <nav className="fixed top-0 w-full z-50 backdrop-blur-md bg-white/10 border-b border-white/20">
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+    <nav className="fixed top-0 z-50 w-full border-b border-white/10 bg-neutral-950/40 backdrop-blur-xl">
+      <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
         <Link
           href="/"
-          className="text-xl font-bold text-white hover:text-white/80 transition-colors"
+          className="text-lg font-semibold tracking-wide text-white transition-colors hover:text-white/80"
         >
           Shadow MedTech AI
         </Link>
 
-        {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center space-x-8">
+        {/* Desktop */}
+        <div className="hidden md:flex items-center justify-center flex-1">
           <NavigationMenu>
-            <NavigationMenuList>
+            <NavigationMenuList className="flex gap-14">
               {navItems.map((item) => (
                 <NavigationMenuItem key={item.href}>
                   <Link
                     href={item.href}
-                    className="text-white/80 hover:text-white transition-colors px-3 py-2 text-sm font-medium"
+                    className="text-base text-white/70 hover:text-white transition-colors"
                   >
                     {item.label}
                   </Link>
@@ -45,56 +43,61 @@ export function Navigation() {
               ))}
             </NavigationMenuList>
           </NavigationMenu>
-
-          <div className="flex items-center space-x-4">
-            <Button
-              variant="ghost"
-              className="text-white/80 hover:text-white hover:bg-white/10"
-              asChild
-            >
-              <Link href="/signin">Sign In</Link>
-            </Button>
-            <Button
-              className="bg-white text-black hover:bg-white/90"
-              asChild
-            >
-              <Link href="/signup">Sign Up</Link>
-            </Button>
-          </div>
         </div>
 
-        {/* Mobile Navigation */}
+        {/* Auth Buttons */}
+        <div className="hidden md:flex items-center gap-4">
+          <Button
+            variant="ghost"
+            className="text-white/70 hover:text-white hover:bg-white/10"
+            asChild
+          >
+            <Link href="/signin">Sign In</Link>
+          </Button>
+          <Button
+            className="bg-white text-black hover:bg-white/90"
+            asChild
+          >
+            <Link href="/signup">Sign Up</Link>
+          </Button>
+        </div>
+
+        {/* Mobile */}
         <div className="md:hidden">
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-white">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-white hover:bg-white/10"
+              >
                 <Menu className="h-6 w-6" />
               </Button>
             </SheetTrigger>
             <SheetContent
               side="right"
-              className="w-[300px] bg-black/95 border-white/20"
+              className="w-[280px] border-l border-white/10 bg-neutral-950/90 backdrop-blur-xl"
             >
-              <div className="flex flex-col space-y-4 mt-8">
+              <div className="mt-10 flex flex-col gap-6">
                 {navItems.map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="text-white/80 hover:text-white transition-colors px-3 py-2 text-lg font-medium"
+                    className="px-3 py-2 text-lg text-white/70 hover:text-white transition-colors"
                   >
                     {item.label}
                   </Link>
                 ))}
-                <hr className="border-white/20" />
+                <div className="h-px bg-white/10" />
                 <Button
                   variant="ghost"
-                  className="text-white/80 hover:text-white justify-start"
+                  className="justify-start text-white/70 hover:text-white"
                   asChild
                 >
                   <Link href="/signin">Sign In</Link>
                 </Button>
                 <Button
-                  className="bg-white text-black hover:bg-white/90 justify-start"
+                  className="justify-start bg-white text-black hover:bg-white/90"
                   asChild
                 >
                   <Link href="/signup">Sign Up</Link>
@@ -105,5 +108,5 @@ export function Navigation() {
         </div>
       </div>
     </nav>
-  );
+  )
 }

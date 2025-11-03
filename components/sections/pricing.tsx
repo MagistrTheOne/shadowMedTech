@@ -66,7 +66,7 @@ export function Pricing() {
   ];
 
   return (
-    <section id="pricing" className="py-24 bg-gradient-to-b from-gray-900 to-black">
+    <section id="pricing" className="py-24 bg-linear-to-b from-gray-900 to-black">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -89,13 +89,13 @@ export function Pricing() {
               key={index}
               className={`relative backdrop-blur-md border-white/10 hover:border-white/20 transition-all duration-300 ${
                 plan.popular
-                  ? "bg-gradient-to-br from-blue-600/20 to-purple-600/20 border-blue-400/30 scale-105"
+                  ? "bg-linear-to-br from-blue-600/20 to-purple-600/20 border-blue-400/30 scale-105"
                   : "bg-white/5 hover:bg-white/10"
               }`}
             >
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <Badge className="bg-gradient-to-r from-blue-600 to-purple-600 text-white border-0 px-4 py-1">
+                  <Badge className="bg-linear-to-r from-blue-600 to-purple-600 text-white border-0 px-4 py-1">
                     <Star className="w-4 h-4 mr-1" />
                     Most Popular
                   </Badge>
@@ -119,7 +119,7 @@ export function Pricing() {
                 <ul className="space-y-3 mb-8">
                   {plan.features.map((feature, featureIndex) => (
                     <li key={featureIndex} className="flex items-center text-slate-300">
-                      <Check className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
+                      <Check className="w-5 h-5 text-green-400 mr-3 shrink-0" />
                       <span>{feature}</span>
                     </li>
                   ))}
@@ -128,7 +128,7 @@ export function Pricing() {
                 <Button
                   className={`w-full py-3 text-lg font-semibold transition-all duration-300 ${
                     plan.popular
-                      ? "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                      ? "bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                       : "border-white/20 text-white hover:bg-white/10 hover:border-white/30"
                   }`}
                   variant={plan.buttonVariant}
@@ -140,26 +140,7 @@ export function Pricing() {
           ))}
         </div>
 
-        {/* Additional Info */}
-        <div className="mt-16 text-center">
-          <Card className="backdrop-blur-md bg-white/5 border-white/10 max-w-2xl mx-auto">
-            <CardContent className="p-8">
-              <h3 className="text-xl font-semibold text-white mb-4">
-                Enterprise Solutions
-              </h3>
-              <p className="text-slate-300 mb-6">
-                Need custom pricing or specialized features for your pharmaceutical training program?
-                Our enterprise solutions include on-premise deployment, custom integrations, and dedicated support.
-              </p>
-              <Button
-                variant="outline"
-                className="border-white/20 text-white hover:bg-white/10 hover:border-white/30"
-              >
-                Schedule Demo
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
+  
 
         {/* Trust Indicators */}
         <div className="mt-16 text-center">

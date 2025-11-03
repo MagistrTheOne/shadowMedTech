@@ -1,16 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Play, TrendingUp, BookOpen, Award, Loader2 } from "lucide-react";
+import { Play, TrendingUp, BookOpen, Award, Loader2, Video, MessageSquare } from "lucide-react";
+import { MainChatZone } from "@/components/dashboard/main-chat-zone";
+import { useVisits } from "@/hooks/use-visits";
 
 export default function RepDashboard() {
-  const { user, signout } = useAuth();
+  const { user } = useAuth();
   const router = useRouter();
+  const { visits, isLoading: visitsLoading } = useVisits();
+  const [selectedVisit, setSelectedVisit] = useState<{
+    id: string;
+    roomName: string;
+    token: string;
+    doctorName: string;
+  } | null>(null);
   const [isCreatingVisit, setIsCreatingVisit] = useState(false);
 
   const createNewVisit = async () => {
@@ -18,7 +27,6 @@ export default function RepDashboard() {
 
     setIsCreatingVisit(true);
     try {
-      // Get available scenarios and doctors
       const [scenariosRes, doctorsRes] = await Promise.all([
         fetch('/api/scenarios'),
         fetch('/api/doctors')
@@ -31,7 +39,6 @@ export default function RepDashboard() {
       const scenariosData = await scenariosRes.json();
       const doctorsData = await doctorsRes.json();
 
-      // Use first available scenario and doctor
       const scenarioId = scenariosData.scenarios[0]?.id;
       const doctorId = doctorsData.doctors[0]?.id;
 
@@ -39,14 +46,10 @@ export default function RepDashboard() {
         throw new Error('No scenarios or doctors available');
       }
 
-      // Create a new visit
       const response = await fetch('/api/visits', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          scenarioId,
-          doctorId,
-        }),
+        body: JSON.stringify({ scenarioId, doctorId }),
       });
 
       if (!response.ok) {
@@ -54,187 +57,167 @@ export default function RepDashboard() {
       }
 
       const data = await response.json();
-      const visitId = data.visit.id;
-
-      // Redirect to the voice chat
-      router.push(`/rep/visits/${visitId}`);
+      
+      // Set as selected visit
+      setSelectedVisit({
+        id: data.visit.id,
+        roomName: data.roomName,
+        token: data.livekitToken,
+        doctorName: data.visit.doctor?.name || 'AI Doctor',
+      });
     } catch (error) {
       console.error('Error creating visit:', error);
-      // TODO: Show error toast
     } finally {
       setIsCreatingVisit(false);
     }
   };
 
+  const handleVisitSelect = async (visit: any) => {
+    if (!visit.livekitRoomName) return;
+
+    try {
+      const tokenResponse = await fetch('/api/livekit/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ roomName: visit.livekitRoomName }),
+      });
+
+      if (!tokenResponse.ok) {
+        throw new Error('Failed to get token');
+      }
+
+      const tokenData = await tokenResponse.json();
+
+      setSelectedVisit({
+        id: visit.id,
+        roomName: visit.livekitRoomName,
+        token: tokenData.token,
+        doctorName: visit.doctor?.name || 'AI Doctor',
+      });
+    } catch (error) {
+      console.error('Error selecting visit:', error);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-white mb-2">
-              Welcome back, {user?.name}
-            </h1>
-            <p className="text-gray-400">
-              Medical Representative Dashboard • Shadow MedTech AI
-            </p>
-          </div>
-          <Button
-            onClick={signout}
-            variant="outline"
-            className="border-white/20 text-white hover:bg-white/10"
-          >
-            Sign Out
-          </Button>
-        </div>
-
-        {/* Quick Stats */}
-        <div className="grid md:grid-cols-4 gap-6 mb-8">
+    <div className="flex-1 flex flex-col gap-4 h-full">
+      <div className="grid lg:grid-cols-3 gap-4 flex-1 min-h-0">
+        {/* Left: Visits List */}
+        <div className="lg:col-span-1 flex flex-col gap-4">
           <Card className="backdrop-blur-md bg-white/5 border-white/10">
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <Play className="w-8 h-8 text-blue-400 mr-3" />
-                <div>
-                  <p className="text-2xl font-bold text-white">12</p>
-                  <p className="text-gray-400 text-sm">Completed Visits</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="backdrop-blur-md bg-white/5 border-white/10">
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <TrendingUp className="w-8 h-8 text-green-400 mr-3" />
-                <div>
-                  <p className="text-2xl font-bold text-white">85%</p>
-                  <p className="text-gray-400 text-sm">Avg. Score</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="backdrop-blur-md bg-white/5 border-white/10">
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <BookOpen className="w-8 h-8 text-purple-400 mr-3" />
-                <div>
-                  <p className="text-2xl font-bold text-white">8</p>
-                  <p className="text-gray-400 text-sm">Scenarios Available</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="backdrop-blur-md bg-white/5 border-white/10">
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <Award className="w-8 h-8 text-yellow-400 mr-3" />
-                <div>
-                  <p className="text-2xl font-bold text-white">2</p>
-                  <p className="text-gray-400 text-sm">Certifications</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Main Actions */}
-        <div className="grid md:grid-cols-2 gap-8 mb-8">
-          {/* Start New Visit */}
-          <Card className="backdrop-blur-md bg-white/10 border-white/20">
             <CardHeader>
-              <CardTitle className="text-white flex items-center">
-                <Play className="w-6 h-6 mr-2 text-blue-400" />
-                Start Training Session
+              <CardTitle className="text-white flex items-center gap-2">
+                <Video className="h-5 w-5" />
+                My Visits
               </CardTitle>
               <CardDescription className="text-gray-400">
-                Begin a new interactive training session with AI-powered doctor simulations
+                Select a visit to start conversation
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex flex-col gap-4">
               <Button
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-lg font-semibold"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                 onClick={createNewVisit}
                 disabled={isCreatingVisit}
               >
                 {isCreatingVisit ? (
                   <>
-                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                    Creating Visit...
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Creating...
                   </>
                 ) : (
-                  'Start New Visit'
+                  <>
+                    <Play className="w-4 h-4 mr-2" />
+                    New Visit
+                  </>
                 )}
               </Button>
+
+              {visitsLoading ? (
+                <div className="text-center py-8">
+                  <Loader2 className="w-6 h-6 animate-spin text-gray-400 mx-auto" />
+                </div>
+              ) : visits.length === 0 ? (
+                <div className="text-center py-8 text-gray-400">
+                  No visits yet. Create your first visit!
+                </div>
+              ) : (
+                <div className="space-y-2 max-h-[calc(100vh-300px)] overflow-y-auto">
+                  {visits.map((visit: any) => (
+                    <Card
+                      key={visit.id}
+                      className={`cursor-pointer transition-all backdrop-blur-md border-white/10 ${
+                        selectedVisit?.id === visit.id
+                          ? 'bg-blue-600/20 border-blue-400/50'
+                          : 'bg-white/5 hover:bg-white/10'
+                      }`}
+                      onClick={() => handleVisitSelect(visit)}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <p className="text-white font-medium text-sm">
+                              {visit.scenario?.title || 'Untitled Visit'}
+                            </p>
+                            <p className="text-gray-400 text-xs mt-1">
+                              Dr. {visit.doctor?.name || 'Unknown'}
+                            </p>
+                            <p className="text-gray-500 text-xs mt-1">
+                              {new Date(visit.createdAt).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <Badge
+                            variant={
+                              visit.status === 'completed'
+                                ? 'default'
+                                : visit.status === 'in_progress'
+                                ? 'secondary'
+                                : 'outline'
+                            }
+                            className="ml-2"
+                          >
+                            {visit.status}
+                          </Badge>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
 
-          {/* View Progress */}
-          <Card className="backdrop-blur-md bg-white/10 border-white/20">
+          {/* Quick Stats */}
+          <Card className="backdrop-blur-md bg-white/5 border-white/10">
             <CardHeader>
-              <CardTitle className="text-white flex items-center">
-                <TrendingUp className="w-6 h-6 mr-2 text-green-400" />
-                View My Progress
-              </CardTitle>
-              <CardDescription className="text-gray-400">
-                Review your performance analytics and improvement recommendations
-              </CardDescription>
+              <CardTitle className="text-white text-lg">Stats</CardTitle>
             </CardHeader>
-            <CardContent>
-              <Button
-                variant="outline"
-                className="w-full border-white/20 text-white hover:bg-white/10 py-3 text-lg font-semibold"
-              >
-                View Evaluations
-              </Button>
+            <CardContent className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-gray-400 text-sm">Completed</span>
+                <span className="text-white font-semibold">
+                  {visits.filter((v: any) => v.status === 'completed').length}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-400 text-sm">In Progress</span>
+                <span className="text-white font-semibold">
+                  {visits.filter((v: any) => v.status === 'in_progress').length}
+                </span>
+              </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Recent Activity */}
-        <Card className="backdrop-blur-md bg-white/5 border-white/10">
-          <CardHeader>
-            <CardTitle className="text-white">Recent Activity</CardTitle>
-            <CardDescription className="text-gray-400">
-              Your latest training sessions and evaluations
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {/* Placeholder for recent visits */}
-              <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
-                <div className="flex items-center space-x-4">
-                  <div className="w-10 h-10 bg-blue-600/20 rounded-full flex items-center justify-center">
-                    <Play className="w-5 h-5 text-blue-400" />
-                  </div>
-                  <div>
-                    <p className="text-white font-medium">Cardiology Visit Simulation</p>
-                    <p className="text-gray-400 text-sm">Completed 2 days ago • Score: 92%</p>
-                  </div>
-                </div>
-                <Badge className="bg-green-600/20 text-green-400 border-green-400/20">
-                  Completed
-                </Badge>
-              </div>
-
-              <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
-                <div className="flex items-center space-x-4">
-                  <div className="w-10 h-10 bg-purple-600/20 rounded-full flex items-center justify-center">
-                    <Award className="w-5 h-5 text-purple-400" />
-                  </div>
-                  <div>
-                    <p className="text-white font-medium">Neurology Scenario</p>
-                    <p className="text-gray-400 text-sm">Completed 1 week ago • Score: 88%</p>
-                  </div>
-                </div>
-                <Badge className="bg-green-600/20 text-green-400 border-green-400/20">
-                  Completed
-                </Badge>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Right: Chat & Voice Zone */}
+        <div className="lg:col-span-2">
+          <MainChatZone
+            visitId={selectedVisit?.id}
+            roomName={selectedVisit?.roomName}
+            token={selectedVisit?.token}
+            doctorName={selectedVisit?.doctorName}
+          />
+        </div>
       </div>
     </div>
   );

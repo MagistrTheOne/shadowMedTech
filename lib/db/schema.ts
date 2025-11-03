@@ -75,6 +75,7 @@ export const visits = pgTable('visits', {
   doctorId: uuid('doctor_id').references(() => doctors.id, { onDelete: 'cascade' }).notNull(),
   status: visitStatusEnum('status').default('scheduled').notNull(),
   livekitRoomName: varchar('livekit_room_name', { length: 256 }),
+  egressId: varchar('egress_id', { length: 256 }), // LiveKit Egress ID for recording
   startedAt: timestamp('started_at'),
   completedAt: timestamp('completed_at'),
   duration: integer('duration'), // in seconds

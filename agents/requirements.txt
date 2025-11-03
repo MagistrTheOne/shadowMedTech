@@ -1,0 +1,11 @@
+# LiveKit Agents Framework
+# Python SDK v1.2.13+ required for LiveKit Inference support
+livekit>=0.11.0
+livekit-agents>=1.2.13
+livekit-plugins-openai>=0.7.0
+livekit-plugins-silero>=0.3.0
+
+# Additional dependencies
+aiohttp>=3.9.0
+python-dotenv>=1.0.0
+

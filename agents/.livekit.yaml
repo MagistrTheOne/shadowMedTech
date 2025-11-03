@@ -1,0 +1,16 @@
+# LiveKit Agent Configuration
+# This file configures the agent for deployment to LiveKit Cloud
+
+agent:
+  name: doctor-agent
+  runtime: python
+  version: "3.11"
+  entrypoint: doctor_agent.py
+  
+  # Build configuration
+  build:
+    requirements: requirements.txt
+    
+  # Environment variables will be set in LiveKit Cloud Dashboard
+  # Do not commit secrets here
+

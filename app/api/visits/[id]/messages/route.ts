@@ -9,17 +9,25 @@ export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const authResult = await requireAuth(request, ['rep', 'trainer']);
-
-  if (authResult instanceof NextResponse) {
-    return authResult;
-  }
-
-  const { user } = authResult;
   const visitId = params.id;
 
+  // Check if request is from agent (service token)
+  const serviceToken = request.headers.get('x-service-token');
+  const expectedToken = process.env.AGENT_SERVICE_TOKEN;
+  const isAgentRequest = serviceToken && expectedToken && serviceToken === expectedToken;
+
+  // For agents, skip auth; for users, require auth
+  let user: any = null;
+  if (!isAgentRequest) {
+    const authResult = await requireAuth(request, ['rep', 'trainer']);
+    if (authResult instanceof NextResponse) {
+      return authResult;
+    }
+    user = authResult.user;
+  }
+
   try {
-    // Verify visit belongs to user
+    // Verify visit exists
     const [visit] = await db
       .select()
       .from(visits)
@@ -30,8 +38,8 @@ export async function GET(
       return NextResponse.json({ error: 'Visit not found' }, { status: 404 });
     }
 
-    // Only allow access to own visits for reps
-    if (user.role === 'rep' && visit.userId !== user.id) {
+    // Only allow access to own visits for reps (skip for agents)
+    if (!isAgentRequest && user && user.role === 'rep' && visit.userId !== user.id) {
       return NextResponse.json({ error: 'Access denied' }, { status: 403 });
     }
 
@@ -63,14 +71,22 @@ export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const authResult = await requireAuth(request, ['rep', 'trainer']);
-
-  if (authResult instanceof NextResponse) {
-    return authResult;
-  }
-
-  const { user } = authResult;
   const visitId = params.id;
+
+  // Check if request is from agent (service token)
+  const serviceToken = request.headers.get('x-service-token');
+  const expectedToken = process.env.AGENT_SERVICE_TOKEN;
+  const isAgentRequest = serviceToken && expectedToken && serviceToken === expectedToken;
+
+  // For agents, skip auth; for users, require auth
+  let user: any = null;
+  if (!isAgentRequest) {
+    const authResult = await requireAuth(request, ['rep', 'trainer']);
+    if (authResult instanceof NextResponse) {
+      return authResult;
+    }
+    user = authResult.user;
+  }
 
   try {
     const { role, content, metadata } = await request.json();
@@ -100,8 +116,8 @@ export async function POST(
       return NextResponse.json({ error: 'Visit not found' }, { status: 404 });
     }
 
-    // Only allow access to own visits for reps
-    if (user.role === 'rep' && visit.userId !== user.id) {
+    // Only allow access to own visits for reps (skip for agents)
+    if (!isAgentRequest && user && user.role === 'rep' && visit.userId !== user.id) {
       return NextResponse.json({ error: 'Access denied' }, { status: 403 });
     }
 
